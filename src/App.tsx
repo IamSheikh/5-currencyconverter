@@ -3,8 +3,12 @@ import numeral from 'numeral';
 import supported_curerncies from './supported_currencies';
 
 const App = () => {
-  const [convertingData, setConvertingData] = useState({
-    amount: 0,
+  const [convertingData, setConvertingData] = useState<{
+    amount: undefined | number;
+    from: string;
+    to: string;
+  }>({
+    amount: undefined,
     from: 'USD',
     to: 'EUR',
   });
@@ -17,7 +21,11 @@ const App = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const url = `https://currency-converter18.p.rapidapi.com/api/v1/convert?from=${convertingData.from}&to=${convertingData.to}&amount=${convertingData.amount}`;
+    const url = `https://currency-converter18.p.rapidapi.com/api/v1/convert?from=${
+      convertingData.from
+    }&to=${convertingData.to}&amount=${
+      convertingData.amount && +convertingData?.amount
+    }`;
     const options = {
       method: 'GET',
       headers: {
@@ -29,17 +37,16 @@ const App = () => {
     try {
       const response = await fetch(url, options);
       const { result } = await response.json();
+      console.log(result);
       setConvertedDetails({
-        amountToConvert: result.amountToConvert,
-        convertedAmount: result.convertedAmount,
+        amountToConvert: +result.amountToConvert,
+        convertedAmount: +result.convertedAmount,
         from: result.from,
         to: result.to,
       });
     } catch (error) {
       console.error(error);
     }
-
-    setConvertingData({ ...convertingData, amount: 0 });
   };
 
   return (
@@ -66,16 +73,17 @@ const App = () => {
           <div className='mb-4'>
             <label className='block text-gray-700'>Amount</label>
             <input
-              type='number'
+              type='text'
               className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='Enter amount'
-              value={convertingData.amount}
+              value={
+                convertingData.amount === 0 ? undefined : convertingData.amount
+              }
               onChange={(e) => {
                 const clone = { ...convertingData };
-                clone.amount = +e.target.value;
+                clone.amount = e.target.value as unknown as number;
                 setConvertingData(clone);
               }}
-              min={1}
               required
             />
           </div>
@@ -131,26 +139,61 @@ const App = () => {
             <div className='mb-2'>
               <div className='text-center'>
                 <p className='text-gray-700'>
-                  <span className='font-bold'>1 {convertedDetails.from}</span>{' '}
-                  is equal to{' '}
+                  {convertedDetails.convertedAmount /
+                    convertedDetails.amountToConvert <
+                  1 ? (
+                    <>
+                      <span className='font-bold'>1 {convertedDetails.to}</span>{' '}
+                      is equal to{' '}
+                      <span className='font-bold'>
+                        {numeral(
+                          convertedDetails.amountToConvert /
+                            convertedDetails.convertedAmount
+                        ).format('0,0.00')}
+                        {convertedDetails.from}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className='font-bold'>
+                        1 {convertedDetails.from}
+                      </span>{' '}
+                      is equal to{' '}
+                      <span className='font-bold'>
+                        {numeral(
+                          convertedDetails.convertedAmount /
+                            convertedDetails.amountToConvert
+                        ).format('0,0.00')}{' '}
+                        {convertedDetails.to}
+                      </span>
+                    </>
+                  )}
+                  {/* {convertedDetails.convertedAmount /
+                    convertedDetails.amountToConvert <
+                  1
+                    ? <span className='font-bold'>1 {convertedDetails.from}</span>
+                  is equal to
                   <span className='font-bold'>
                     {numeral(
                       convertedDetails.convertedAmount /
                         convertedDetails.amountToConvert
-                    ).format('0,0.00')}{' '}
+                    ).format('0,0.00')}
                     {convertedDetails.to}
                   </span>
+                    : ''} */}
                 </p>
               </div>
               <div className='flex'>
                 <p className='text-gray-700'>
                   <span className='font-bold'>
-                    {convertedDetails.amountToConvert} {convertedDetails.from}
+                    {numeral(convertedDetails.amountToConvert).format('0,0.00')}{' '}
+                    {convertedDetails.from}
                   </span>{' '}
                   is equal to:{' '}
                   <span className='font-bold'>
-                    {/* {convertedDetails.convertedAmount.toFixed(2)}{' '} */}
-                    {numeral(convertedDetails.convertedAmount).format('0,0.00')}
+                    {numeral(convertedDetails.convertedAmount).format(
+                      '0,0.0000'
+                    )}
                     {convertedDetails.to}
                   </span>{' '}
                 </p>
