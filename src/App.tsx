@@ -143,9 +143,8 @@ const App = () => {
                     convertedDetails.amountToConvert <
                   1 ? (
                     <>
-                      <span className='font-bold'>1 {convertedDetails.to}</span>{' '}
-                      is equal to{' '}
-                      <span className='font-bold'>
+                      <span>1 {convertedDetails.to}</span> is equal to{' '}
+                      <span>
                         {numeral(
                           convertedDetails.amountToConvert /
                             convertedDetails.convertedAmount
@@ -155,11 +154,8 @@ const App = () => {
                     </>
                   ) : (
                     <>
-                      <span className='font-bold'>
-                        1 {convertedDetails.from}
-                      </span>{' '}
-                      is equal to{' '}
-                      <span className='font-bold'>
+                      <span>1 {convertedDetails.from}</span> is equal to{' '}
+                      <span>
                         {numeral(
                           convertedDetails.convertedAmount /
                             convertedDetails.amountToConvert
@@ -185,21 +181,19 @@ const App = () => {
               </div>
               <div className='flex'>
                 <p className='text-gray-700'>
-                  <span className='font-bold'>
-                    {numeral(convertedDetails.amountToConvert).format('0,0.00')}{' '}
-                    {convertedDetails.from}
+                  <span>
+                    {numeral(convertedDetails.convertedAmount).format(
+                      '0,0.0000'
+                    )}{' '}
+                    {convertedDetails.to}
                   </span>{' '}
                   is equal to:{' '}
                   <span className='font-bold'>
-                    {numeral(convertedDetails.convertedAmount).format(
-                      '0,0.0000'
-                    )}
-                    {convertedDetails.to}
+                    {numeral(convertedDetails.amountToConvert).format('0,0.00')}
+                    {convertedDetails.from}
                   </span>{' '}
                 </p>
-                <p className='font-bold ml-1'></p>
               </div>
-              <h1></h1>
             </div>
           )}
       </div>
